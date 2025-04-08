@@ -1,12 +1,13 @@
 # SynthMem
 
-SynthMem is a project designed to simulate and manage synthetic memory processes. It provides tools and functionalities to create, manipulate, and analyze synthetic memory data.
+SynthMem is a web application designed for musicians to save and manage synthesizer settings and configurations. It provides an intuitive interface for creating custom control layouts, storing presets, and organizing your synthesizer patches.
 
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
-- You have installed Node.js and npm.
-- You have a basic understanding of Angular.
+- You have installed Node.js and npm
+- You have a basic understanding of React
+- You have Docker installed (for local development with PostgreSQL)
 
 ## Installation
 
@@ -31,31 +32,35 @@ npm start
 
 ## Features
 
-- Create synthetic memory data
-- Manipulate and analyze memory processes
-- Visualize memory data
+- Create custom control layouts for synthesizers and other equipment
+- Save and load preset configurations
+- Organize presets with tags and categories
+- Add images and audio samples to your presets
+- Works offline as a Progressive Web App (PWA)
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm run dev` for a dev server. Navigate to `http://localhost:5173/`. The app will automatically reload if you change any of the source files.
 
-`ng serve` is used to start the Angular development server.
+## Docker Development
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Run `docker-compose up` to start the development environment with PostgreSQL database.
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
+
+## PWA Build
+
+Run `npm run build:pwa` to build the project as a Progressive Web App with offline capabilities.
 
 ## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Run `npm test` to execute the unit tests via [Vitest](https://vitest.dev/).
 
 ## Running end-to-end tests
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Run `npm run test:e2e` to execute the end-to-end tests via [Cypress](https://www.cypress.io/).
 
 ## Contributing
 
@@ -65,6 +70,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Deployment
+
+The application is designed to be deployed as a static site on DigitalOcean web server. See the deployment documentation for detailed instructions.
+
 ## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+To get more help on Vite, check out the [Vite documentation](https://vitejs.dev/guide/).
+For React, refer to the [React documentation](https://reactjs.org/docs/getting-started.html).
