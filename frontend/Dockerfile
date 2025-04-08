@@ -13,9 +13,17 @@ FROM dependencies AS development
 COPY . .
 CMD ["npm", "run", "dev"]
 
-# Build stage
-FROM dependencies AS build
+# Lint stage
+FROM dependencies AS lint
 COPY . .
+RUN npm run lint:all
+
+# Test stage
+FROM lint AS test
+RUN npm test
+
+# Build stage
+FROM test AS build
 RUN npm run build
 
 # Production stage

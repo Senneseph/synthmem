@@ -31,23 +31,49 @@ Once the Docker service is running, you can access the application in your web b
 - Add images and audio samples to your presets
 - Works offline as a Progressive Web App (PWA)
 
-## Docker Development
+## Development
+
+### Docker Development
 
 ```bash
-docker-compose build
+docker-compose up
 ```
 
-## Running unit tests
+### Linting
 
-Run automatically as part of the container build process.
+We use several linters to ensure code quality:
 
-## Running end-to-end tests
+```bash
+# Run all linters
+docker-compose run --rm frontend npm run lint:all
 
-Run automatically as part of the container build process.
+# Run specific linters
+docker-compose run --rm frontend npm run lint       # ESLint for JavaScript/React
+docker-compose run --rm frontend npm run lint:css    # Stylelint for CSS
+docker-compose run --rm frontend npm run lint:yaml   # YAML lint for YAML files
+```
+
+Linting is automatically run as part of the git pre-commit hook and during the Docker build process.
+
+### Running unit tests
+
+```bash
+docker-compose run --rm frontend npm test
+```
+
+Tests are automatically run as part of the git pre-push hook and during the Docker build process.
+
+### Running end-to-end tests
+
+```bash
+docker-compose run --rm frontend npm run test:e2e
+```
+
+End-to-end tests are automatically run during the Docker build process.
 
 ## Contributing
 
-Contributions are welcome! Please be generous with your donations and kind thoughts.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on how to contribute to this project.
 
 ## License
 

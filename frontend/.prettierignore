@@ -1,0 +1,14 @@
+# Ignore artifacts:
+build
+dist
+coverage
+node_modules
+
+# Ignore all HTML files:
+*.html
+
+# Ignore specific files
+.eslintrc.cjs
+.prettierrc
+package-lock.json
+yarn.lock
