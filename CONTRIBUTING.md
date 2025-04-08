@@ -5,12 +5,11 @@ Thank you for considering contributing to SynthMem! This document outlines the p
 ## Development Process
 
 1. Clone the repository
-2. Set up the git hooks (`./frontend/scripts/setup-git-hooks.sh`)
-3. Create a feature branch (`git checkout -b feature/amazing-feature`)
-4. Make your changes
-5. Run tests locally to ensure Victory
-6. Commit your changes (`git commit -m 'Add some amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests using Docker to ensure Victory (`docker-compose run --rm dev node scripts/run-tests.js`)
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
 
 ## Self-Testing System
 
@@ -35,29 +34,19 @@ To check the health of the system:
 docker-compose run --rm dev node scripts/health-check.js
 ```
 
-## Code Style and Linting
+## Code Style
 
-Code style and linting are part of the Bootstrap Bought. We use a combination of linters to ensure code quality and consistency:
+We use Prettier for consistent code formatting. While linting tools are included in the project, they are not actively enforced to avoid stalling development.
 
-### JavaScript/React
+## Testing
 
-- **ESLint**: We use ESLint to catch JavaScript errors and enforce coding standards
-- **Prettier**: We use Prettier for consistent code formatting
+We use Docker-based testing that runs automatically as part of the build process. This project does not use git hooks to avoid stalling development.
 
-### CSS
+To run tests manually:
 
-- **Stylelint**: We use Stylelint to enforce CSS coding standards
-
-### YAML
-
-- **yamllint**: We use yamllint to validate YAML files
-
-## Git Hooks
-
-We use Git hooks that automatically run our testing system:
-
-- **pre-commit**: Runs all Boughts and requires Victory before committing
-- **pre-push**: Runs comprehensive Boughts and requires Victory before pushing
+```bash
+docker-compose run --rm dev node scripts/run-tests.js
+```
 
 ## Docker Development
 

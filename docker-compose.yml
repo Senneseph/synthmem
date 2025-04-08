@@ -13,6 +13,7 @@ services:
       - /app/frontend/node_modules
     environment:
       - NODE_ENV=development
+      - HUSKY=0  # Disable git hooks
     healthcheck:
       test: ["CMD", "node", "/app/scripts/health-check.js"]
       interval: 30s

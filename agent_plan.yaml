@@ -68,6 +68,7 @@ execution_phases:
     - Implement end-to-end tests
     - Performance optimization
     - Security audit
+    - Code quality is maintained through code reviews rather than automated linting
 
   8_pwa_setup:
     - Configure service workers

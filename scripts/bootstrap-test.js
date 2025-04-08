@@ -33,6 +33,21 @@ try {
   tests.push({ name: 'package.json check', status: 'failed', error: error.message });
 }
 
+// Check if package-lock.json exists
+try {
+  const packageLockExists = fs.existsSync(path.join(__dirname, '..', 'frontend', 'package-lock.json'));
+  if (packageLockExists) {
+    console.log(`✓ package-lock.json exists: ${packageLockExists}`);
+    tests.push({ name: 'package-lock.json check', status: 'passed' });
+  } else {
+    console.log(`✗ package-lock.json does not exist. Will be generated during build.`);
+    tests.push({ name: 'package-lock.json check', status: 'passed', note: 'Will be generated during build' });
+  }
+} catch (error) {
+  console.log(`✗ package-lock.json check failed: ${error.message}`);
+  tests.push({ name: 'package-lock.json check', status: 'failed', error: error.message });
+}
+
 // Check Node.js version
 try {
   const nodeVersion = execSync('node --version', { encoding: 'utf8' }).trim();

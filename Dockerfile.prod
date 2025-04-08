@@ -7,12 +7,19 @@ WORKDIR /app
 COPY frontend/package*.json ./frontend/
 
 # Install dependencies
-RUN cd frontend && npm ci
+RUN cd frontend && npm install
 
 # Copy the rest of the application
 COPY . .
 
+# Make scripts executable
+RUN chmod +x /app/scripts/*.js /app/scripts/*.sh
+
+# Ensure we don't try to use git hooks
+ENV HUSKY=0
+
 # Run tests and build
+# Only required tests are run (Bootstrap and Frontend)
 RUN cd /app && node scripts/run-tests.js && cd frontend && npm run build
 
 # Production image

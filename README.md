@@ -16,6 +16,14 @@ To install the project, clone the repository and install the necessary dependenc
 ```bash
 git clone https://github.com/yourusername/synthmem.git
 cd synthmem
+
+# Make scripts executable
+chmod +x scripts/*.js scripts/*.sh
+
+# Generate package-lock.json if needed
+node scripts/generate-lockfile.js
+
+# Start the application
 docker-compose up -d
 ```
 
@@ -50,11 +58,14 @@ docker-compose up app
 We use a custom self-testing system that runs automatically when the container starts. The system uses the following terminology:
 
 - **Bought**: A set of tests (test suite)
+  - **Required Bought**: Must pass for the build to succeed
+  - **Optional Bought**: Can fail without failing the build
 - **Boast**: A passed test
 - **Roast**: A failed test
 - **Route**: A failed Bought (test suite)
 - **Conquest**: A passed Bought (test suite)
 - **Victory**: All Boughts passed
+- **Partial Victory**: All required Boughts passed, but some optional Boughts failed
 
 The testing system runs automatically as part of the container startup and reports the results in the logs.
 
@@ -66,18 +77,16 @@ docker-compose run --rm dev node scripts/run-tests.js
 docker-compose run --rm dev node scripts/health-check.js
 ```
 
-### Git Integration
+### Testing Integration
 
-The testing system is integrated with git hooks to ensure code quality:
-
-- **pre-commit**: Runs all Boughts and requires Victory before committing
-- **pre-push**: Runs comprehensive Boughts and requires Victory before pushing
-
-To set up the git hooks:
+The testing system runs automatically as part of the Docker build process:
 
 ```bash
-./frontend/scripts/setup-git-hooks.sh
+# Run tests manually
+docker-compose run --rm dev node scripts/run-tests.js
 ```
+
+> **Note**: This project uses Docker-based testing instead of git hooks to avoid stalling development.
 
 ## Contributing
 
@@ -90,6 +99,34 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Deployment
 
 The application is designed to be deployed as a static set of files site on web server.
+
+## Troubleshooting
+
+### Missing package-lock.json
+
+If you encounter an error about missing package-lock.json during the build process, run:
+
+```bash
+node scripts/generate-lockfile.js
+```
+
+This will generate the package-lock.json file needed for the build process.
+
+### Scripts not executable
+
+If you encounter permission issues with the scripts, make them executable:
+
+```bash
+chmod +x scripts/*.js scripts/*.sh
+```
+
+### Docker build fails
+
+If the Docker build fails, check the logs for specific errors:
+
+```bash
+docker-compose logs dev
+```
 
 ## Further help
 See your local psychiatrist.

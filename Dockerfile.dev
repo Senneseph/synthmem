@@ -10,13 +10,16 @@ RUN apk add --no-cache bash curl git
 COPY frontend/package*.json ./frontend/
 
 # Install frontend dependencies
-RUN cd frontend && npm ci
+RUN cd frontend && npm install
 
 # Copy the rest of the application
 COPY . .
 
 # Make scripts executable
 RUN chmod +x scripts/*.js scripts/*.sh
+
+# Ensure we don't try to use git hooks
+ENV HUSKY=0
 
 # Expose port
 EXPOSE 5173

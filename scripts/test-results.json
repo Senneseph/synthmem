@@ -1,0 +1,64 @@
+{
+  "Bootstrap": {
+    "description": "Basic system checks",
+    "tests": [
+      {
+        "name": "Frontend directory exists: true",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "name": "package.json exists: true",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "name": "package-lock.json exists: true",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "name": "Node.js version: v18.20.8",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "name": "npm version: 10.8.2",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "name": "ESLint config exists: true",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "name": "Prettier config exists: true",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "name": "Vite config exists: true",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "name": ": All bootstrap tests passed",
+        "status": "passed",
+        "error": null
+      }
+    ],
+    "status": "passed"
+  },
+  "Frontend": {
+    "description": "Frontend unit tests",
+    "tests": [
+      {
+        "name": "src/App.test.jsx  (3 tests) 63ms",
+        "status": "passed",
+        "error": null
+      }
+    ],
+    "status": "passed"
+  }
+}
