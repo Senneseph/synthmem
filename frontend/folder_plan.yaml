@@ -1,28 +1,35 @@
-folder_name: frontend
+# SynthMem Frontend Plan
+name: frontend
 description: React frontend for SynthMem application
 
-tech_stack:
-  framework: React
-  build_tool: Vite
-  ui_library: "@mui/material"
-  state_management: "@reduxjs/toolkit"
-  styling: "styled-components"
-  pwa: true
+# Technology stack
+technology:
+  - name: React
+  - name: Vite
+  - name: Material UI
+  - name: Redux Toolkit
+  - name: Styled Components
+  - name: PWA
 
+# Folder structure
 structure:
-  - public/: Static assets and PWA icons
-  - src/: Source code
-    - components/: React components (to be implemented)
-    - test/: Test setup and utilities
-    - App.jsx: Main application component
-    - main.jsx: Application entry point
-    - index.css: Global styles
+  - folder: public
+    description: Static assets and PWA icons
+  - folder: src
+    description: Source code and components
+    subfolders:
+      - name: components
+        description: React components
+      - name: test
+        description: Test setup and utilities
 
-development:
-  - Run with Docker: `docker-compose up`
-  - Test with Docker: `docker-compose -f docker-compose.test.yml up`
-  - Build with Docker: `docker-compose run --rm frontend npm run build`
-
-deployment:
-  - Build as PWA: `docker-compose run --rm frontend npm run build:pwa`
-  - Deploy to DigitalOcean: Copy dist/ directory to web server
+# Development commands
+commands:
+  - name: development
+    command: docker-compose up
+  - name: test
+    command: docker-compose -f docker-compose.test.yml up
+  - name: build
+    command: docker-compose run --rm frontend npm run build
+  - name: build_pwa
+    command: docker-compose run --rm frontend npm run build:pwa

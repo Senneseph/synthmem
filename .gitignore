@@ -27,6 +27,9 @@
 
 # misc
 .env
+agent_play.yaml
+PROPOSAL.md
+.gitignore
 /.sass-cache
 /connect.lock
 /coverage
@@ -35,6 +38,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+
 
 # e2e
 /e2e/*.js
