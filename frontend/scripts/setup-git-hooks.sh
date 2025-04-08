@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script sets up git hooks for the project
+# This script sets up git hooks for the project using our custom test vocabulary
 
 # Ensure we're in the project root
 cd "$(dirname "$0")/../.."
@@ -25,9 +25,23 @@ npm run prepare
 chmod +x .husky/pre-commit
 chmod +x .husky/pre-push
 
-echo "Git hooks have been set up successfully!"
-echo "The following hooks are now active:"
-echo "- pre-commit: Runs linters on staged files"
-echo "- pre-push: Runs tests before pushing to remote"
+# Make the test scripts executable
+cd ..
+chmod +x scripts/*.js
+chmod +x scripts/*.sh
+
+echo "🎮 Git hooks have been set up successfully!"
+echo "The following Boughts will be run:"
+echo "- pre-commit: Runs all Boughts and requires Victory before committing"
+echo "- pre-push: Runs comprehensive Boughts and requires Victory before pushing"
+
+echo "\nRunning a test Bought to verify setup..."
+node scripts/bootstrap-test.js
+
+if [ $? -eq 0 ]; then
+  echo "\n🏆 Victory! Bootstrap Bought passed. Your setup is complete."
+else
+  echo "\n❌ Route! Bootstrap Bought failed. Please fix the issues before continuing."
+fi
 
 exit 0

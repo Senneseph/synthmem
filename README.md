@@ -35,41 +35,49 @@ Once the Docker service is running, you can access the application in your web b
 
 ### Docker Development
 
-```bash
-docker-compose up
-```
-
-### Linting
-
-We use several linters to ensure code quality:
+We use Docker for both development and production environments. The development environment includes testing and linting capabilities.
 
 ```bash
-# Run all linters
-docker-compose run --rm frontend npm run lint:all
+# Start the development environment
+docker-compose up dev
 
-# Run specific linters
-docker-compose run --rm frontend npm run lint       # ESLint for JavaScript/React
-docker-compose run --rm frontend npm run lint:css    # Stylelint for CSS
-docker-compose run --rm frontend npm run lint:yaml   # YAML lint for YAML files
+# Start the production environment
+docker-compose up app
 ```
 
-Linting is automatically run as part of the git pre-commit hook and during the Docker build process.
+### Self-Testing System
 
-### Running unit tests
+We use a custom self-testing system that runs automatically when the container starts. The system uses the following terminology:
+
+- **Bought**: A set of tests (test suite)
+- **Boast**: A passed test
+- **Roast**: A failed test
+- **Route**: A failed Bought (test suite)
+- **Conquest**: A passed Bought (test suite)
+- **Victory**: All Boughts passed
+
+The testing system runs automatically as part of the container startup and reports the results in the logs.
 
 ```bash
-docker-compose run --rm frontend npm test
+# Run all tests manually
+docker-compose run --rm dev node scripts/run-tests.js
+
+# Check the health of the system
+docker-compose run --rm dev node scripts/health-check.js
 ```
 
-Tests are automatically run as part of the git pre-push hook and during the Docker build process.
+### Git Integration
 
-### Running end-to-end tests
+The testing system is integrated with git hooks to ensure code quality:
+
+- **pre-commit**: Runs all Boughts and requires Victory before committing
+- **pre-push**: Runs comprehensive Boughts and requires Victory before pushing
+
+To set up the git hooks:
 
 ```bash
-docker-compose run --rm frontend npm run test:e2e
+./frontend/scripts/setup-git-hooks.sh
 ```
-
-End-to-end tests are automatically run during the Docker build process.
 
 ## Contributing
 

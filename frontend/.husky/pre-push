@@ -1,4 +1,20 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-cd frontend && npm run test
+echo "🧪 Running pre-push checks..."
+
+# Run a more comprehensive test suite before pushing
+OUTPUT=$(cd "$(git rev-parse --show-toplevel)" && node scripts/run-tests.js --comprehensive 2>&1)
+EXIT_CODE=$?
+
+# Display the output
+echo "$OUTPUT"
+
+# Check if any Bought failed
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ Defeat! Some Boughts failed. Push aborted."
+  exit 1
+fi
+
+echo "🏆 Victory! All Boughts passed. Proceeding with push."
+exit 0

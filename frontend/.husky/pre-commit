@@ -1,4 +1,20 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-cd frontend && npx lint-staged
+echo "🧪 Running pre-commit checks..."
+
+# Run the test script and capture its output
+OUTPUT=$(cd "$(git rev-parse --show-toplevel)" && node scripts/run-tests.js 2>&1)
+EXIT_CODE=$?
+
+# Display the output
+echo "$OUTPUT"
+
+# Check if any Bought failed
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ Defeat! Some Boughts failed. Commit aborted."
+  exit 1
+fi
+
+echo "🏆 Victory! All Boughts passed. Proceeding with commit."
+exit 0

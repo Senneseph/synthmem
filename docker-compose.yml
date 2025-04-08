@@ -1,41 +1,40 @@
 version: '3.8'
 
 services:
-  frontend:
+  # Development and testing environment
+  dev:
     build:
-      context: ./frontend
-      target: development
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./:/app
+      - /app/frontend/node_modules
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://localhost:3000
-    command: npm run dev -- --host 0.0.0.0
+    healthcheck:
+      test: ["CMD", "node", "/app/scripts/health-check.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: sh -c "cd /app && node scripts/run-tests.js && cd frontend && npm run dev -- --host 0.0.0.0"
 
-  lint:
+  # Production environment
+  app:
     build:
-      context: ./frontend
-      target: dependencies
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
-    command: npm run lint:all
-
-  test:
-    build:
-      context: ./frontend
-      target: dependencies
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=test
-    command: npm test
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # We'll add the backend service later when needed
   # backend:
