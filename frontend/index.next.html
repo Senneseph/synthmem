@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bit Dial Color Graphics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s ease;
+        }
+        
+        .pixel-border {
+            border-style: solid;
+            border-width: 2px;
+            image-rendering: pixelated;
+        }
+        
+        .scanlines {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scanlines::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.2) 51%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+        
+        .blocky {
+            image-rendering: pixelated;
+        }
+        
+        .channel-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 0;
+            cursor: pointer;
+        }
+        
+        .red-channel::-webkit-slider-thumb {
+            background: #ff0000;
+            box-shadow: 0 0 5px #ff0000;
+        }
+        
+        .green-channel::-webkit-slider-thumb {
+            background: #00ff00;
+            box-shadow: 0 0 5px #00ff00;
+        }
+        
+        .blue-channel::-webkit-slider-thumb {
+            background: #0000ff;
+            box-shadow: 0 0 5px #0000ff;
+        }
+        
+        .alpha-channel::-webkit-slider-thumb {
+            background: #ffffff;
+            box-shadow: 0 0 5px #ffffff;
+        }
+        
+        .bit-depth-indicator {
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, #000000, #ffffff);
+            margin-top: 5px;
+        }
+        
+        .pixel-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+        }
+        
+        .pixel {
+            aspect-ratio: 1/1;
+            transition: all 0.1s ease;
+        }
+        
+        .pixel:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transition: .4s;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            transition: .4s;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold mb-2 tracking-wider">BIT DIAL COLOR GRAPHICS</h1>
+            <p class="text-gray-400">Dynamic retro pixel art controls</p>
+        </header>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Controls Panel -->
+            <div class="lg:col-span-1 bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-6 border-b border-gray-700 pb-2">CONTROLS</h2>
+                
+                <!-- Scanline Effect -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-bold">SCANLINE EFFECT</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="scanlineToggle" checked>
+                            <span class="toggle-slider bg-gray-700"></span>
+                        </label>
+                    </div>
+                    <p class="text-gray-400 text-sm">Simulates CRT monitor scanlines</p>
+                </div>
+                
+                <!-- Blockiness -->
+                <div class="mb-6">
+                    <label class="font-bold block mb-2">BLOCKINESS</label>
+                    <input type="range" id="blockinessSlider" min="1" max="8" value="4" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>1</span>
+                        <span>2</span>
+                        <span>3</span>
+                        <span>4</span>
+                        <span>5</span>
+                        <span>6</span>
+                        <span>7</span>
+                        <span>8</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-1">Adjusts pixel granularity</p>
+                </div>
+                
+                <!-- Color Channels -->
+                <div class="mb-6">
+                    <label class="font-bold block mb-2">COLOR CHANNELS</label>
+                    <div class="flex space-x-2 mb-2">
+                        <button class="channel-btn px-3 py-1 rounded" data-channels="1">1</button>
+                        <button class="channel-btn px-3 py-1 rounded" data-channels="2">2</button>
+                        <button class="channel-btn px-3 py-1 rounded" data-channels="3">3</button>
+                        <button class="channel-btn active px-3 py-1 rounded" data-channels="4">4</button>
+                    </div>
+                    <p class="text-gray-400 text-sm">Select active color channels (RGBA)</p>
+                </div>
+                
+                <!-- Bit Depth -->
+                <div class="mb-6">
+                    <label class="font-bold block mb-2">BIT DEPTH</label>
+                    <input type="range" id="bitDepthSlider" min="1" max="8" value="4" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    <div class="bit-depth-indicator" id="bitDepthIndicator"></div>
+                    <p class="text-gray-400 text-sm mt-1">Color resolution (1-8 bit)</p>
+                </div>
+                
+                <!-- Channel Controls -->
+                <div class="mb-6">
+                    <label class="font-bold block mb-2">CHANNEL INTENSITY</label>
+                    
+                    <div class="mb-3">
+                        <label class="block mb-1 text-red-400">RED</label>
+                        <input type="range" id="redChannel" min="0" max="255" value="255" class="w-full channel-slider red-channel">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="block mb-1 text-green-400">GREEN</label>
+                        <input type="range" id="greenChannel" min="0" max="255" value="180" class="w-full channel-slider green-channel">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="block mb-1 text-blue-400">BLUE</label>
+                        <input type="range" id="blueChannel" min="0" max="255" value="120" class="w-full channel-slider blue-channel">
+                    </div>
+                    
+                    <div>
+                        <label class="block mb-1 text-gray-200">ALPHA</label>
+                        <input type="range" id="alphaChannel" min="0" max="255" value="255" class="w-full channel-slider alpha-channel">
+                    </div>
+                </div>
+                
+                <button id="randomizeBtn" class="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 rounded font-bold transition-all">
+                    RANDOMIZE PRESET
+                </button>
+            </div>
+            
+            <!-- Preview Area -->
+            <div class="lg:col-span-2">
+                <div class="bg-gray-800 p-6 rounded-lg h-full">
+                    <h2 class="text-2xl font-bold mb-6 border-b border-gray-700 pb-2">VISUAL PREVIEW</h2>
+                    
+                    <!-- Pixel Art Display -->
+                    <div class="mb-8">
+                        <div id="pixelDisplay" class="pixel-grid mb-4">
+                            <!-- Pixel grid will be generated by JavaScript -->
+                        </div>
+                        <p class="text-gray-400 text-center">Interactive pixel grid</p>
+                    </div>
+                    
+                    <!-- UI Components Demo -->
+                    <div>
+                        <h3 class="font-bold mb-4 text-xl">UI COMPONENTS DEMO</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-700 p-4 rounded">
+                                <h4 class="font-bold mb-2">Buttons</h4>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 bg-blue-600 rounded">Primary</button>
+                                    <button class="px-3 py-1 bg-gray-600 rounded">Secondary</button>
+                                    <button class="px-3 py-1 border border-gray-500 rounded">Outline</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-700 p-4 rounded">
+                                <h4 class="font-bold mb-2">Inputs</h4>
+                                <div class="space-y-2">
+                                    <input type="text" placeholder="Text input" class="w-full px-3 py-1 bg-gray-800 border border-gray-600 rounded">
+                                    <select class="w-full px-3 py-1 bg-gray-800 border border-gray-600 rounded">
+                                        <option>Select option</option>
+                                        <option>Option 1</option>
+                                        <option>Option 2</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-700 p-4 rounded mb-6">
+                            <h4 class="font-bold mb-2">Progress Indicators</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500" style="width: 45%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                        <div class="h-full bg-blue-500" style="width: 70%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                        <div class="h-full bg-red-500" style="width: 30%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-700 p-4 rounded">
+                            <h4 class="font-bold mb-2">Cards</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="bg-gray-800 p-3 rounded">
+                                    <div class="h-16 mb-2 bg-blue-900 rounded"></div>
+                                    <h5 class="font-bold">Card Title</h5>
+                                    <p class="text-xs text-gray-400">Sample card content</p>
+                                </div>
+                                <div class="bg-gray-800 p-3 rounded">
+                                    <div class="h-16 mb-2 bg-purple-900 rounded"></div>
+                                    <h5 class="font-bold">Card Title</h5>
+                                    <p class="text-xs text-gray-400">Sample card content</p>
+                                </div>
+                                <div class="bg-gray-800 p-3 rounded">
+                                    <div class="h-16 mb-2 bg-green-900 rounded"></div>
+                                    <h5 class="font-bold">Card Title</h5>
+                                    <p class="text-xs text-gray-400">Sample card content</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const scanlineToggle = document.getElementById('scanlineToggle');
+        const blockinessSlider = document.getElementById('blockinessSlider');
+        const channelButtons = document.querySelectorAll('.channel-btn');
+        const bitDepthSlider = document.getElementById('bitDepthSlider');
+        const bitDepthIndicator = document.getElementById('bitDepthIndicator');
+        const redChannel = document.getElementById('redChannel');
+        const greenChannel = document.getElementById('greenChannel');
+        const blueChannel = document.getElementById('blueChannel');
+        const alphaChannel = document.getElementById('alphaChannel');
+        const randomizeBtn = document.getElementById('randomizeBtn');
+        const pixelDisplay = document.getElementById('pixelDisplay');
+        const body = document.body;
+        
+        // Current settings
+        let settings = {
+            scanlines: true,
+            blockiness: 4,
+            channels: 4,
+            bitDepth: 4,
+            colors: {
+                red: 255,
+                green: 180,
+                blue: 120,
+                alpha: 255
+            }
+        };
+        
+        // Initialize
+        function init() {
+            // Generate pixel grid
+            generatePixelGrid();
+            
+            // Set initial UI state
+            updateUI();
+            
+            // Event listeners
+            scanlineToggle.addEventListener('change', toggleScanlines);
+            blockinessSlider.addEventListener('input', updateBlockiness);
+            channelButtons.forEach(btn => btn.addEventListener('click', setColorChannels));
+            bitDepthSlider.addEventListener('input', updateBitDepth);
+            redChannel.addEventListener('input', updateColorChannels);
+            greenChannel.addEventListener('input', updateColorChannels);
+            blueChannel.addEventListener('input', updateColorChannels);
+            alphaChannel.addEventListener('input', updateColorChannels);
+            randomizeBtn.addEventListener('click', randomizeSettings);
+        }
+        
+        // Generate pixel grid
+        function generatePixelGrid() {
+            pixelDisplay.innerHTML = '';
+            const pixelCount = 64; // 8x8 grid
+            
+            for (let i = 0; i < pixelCount; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                
+                // Random color for demo
+                const r = Math.floor(Math.random() * 256);
+                const g = Math.floor(Math.random() * 256);
+                const b = Math.floor(Math.random() * 256);
+                const a = Math.random().toFixed(2);
+                
+                pixel.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${a})`;
+                pixel.setAttribute('data-color', `${r},${g},${b},${a}`);
+                
+                pixel.addEventListener('click', function() {
+                    const currentColor = this.getAttribute('data-color');
+                    alert(`Pixel color: RGBA(${currentColor})`);
+                });
+                
+                pixelDisplay.appendChild(pixel);
+            }
+        }
+        
+        // Toggle scanlines
+        function toggleScanlines() {
+            settings.scanlines = scanlineToggle.checked;
+            updateUI();
+        }
+        
+        // Update blockiness
+        function updateBlockiness() {
+            settings.blockiness = parseInt(blockinessSlider.value);
+            
+            // Apply blockiness to all UI elements
+            const elements = document.querySelectorAll('button, input, select, .bg-gray-800, .bg-gray-700');
+            
+            if (settings.blockiness > 4) {
+                elements.forEach(el => {
+                    el.classList.add('pixel-border');
+                    el.style.borderWidth = `${Math.min(settings.blockiness - 3, 4)}px`;
+                });
+                
+                // Make pixel display more blocky
+                pixelDisplay.classList.add('blocky');
+                pixelDisplay.style.gap = `${settings.blockiness - 3}px`;
+                
+                const pixels = document.querySelectorAll('.pixel');
+                pixels.forEach(p => {
+                    p.style.border = `${settings.blockiness - 3}px solid rgba(0,0,0,0.2)`;
+                });
+            } else {
+                elements.forEach(el => {
+                    el.classList.remove('pixel-border');
+                });
+                
+                // Make pixel display less blocky
+                pixelDisplay.classList.remove('blocky');
+                pixelDisplay.style.gap = '2px';
+                
+                const pixels = document.querySelectorAll('.pixel');
+                pixels.forEach(p => {
+                    p.style.border = 'none';
+                });
+            }
+        }
+        
+        // Set color channels
+        function setColorChannels(e) {
+            channelButtons.forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            settings.channels = parseInt(e.target.dataset.channels);
+            updateUI();
+        }
+        
+        // Update bit depth
+        function updateBitDepth() {
+            settings.bitDepth = parseInt(bitDepthSlider.value);
+            
+            // Update bit depth indicator
+            const steps = Math.pow(2, settings.bitDepth) - 1;
+            const stepWidth = 100 / steps;
+            let gradient = '';
+            
+            for (let i = 0; i <= steps; i++) {
+                const pos = i * stepWidth;
+                const value = Math.round((i / steps) * 255);
+                gradient += `, rgb(${value}, ${value}, ${value}) ${pos}%`;
+            }
+            
+            bitDepthIndicator.style.background = `linear-gradient(90deg${gradient})`;
+            
+            // Apply bit depth reduction to UI
+            applyBitDepth();
+        }
+        
+        // Update color channels
+        function updateColorChannels() {
+            settings.colors = {
+                red: parseInt(redChannel.value),
+                green: parseInt(greenChannel.value),
+                blue: parseInt(blueChannel.value),
+                alpha: parseInt(alphaChannel.value)
+            };
+            
+            // Update UI colors
+            updateThemeColors();
+        }
+        
+        // Apply bit depth reduction
+        function applyBitDepth() {
+            const steps = Math.pow(2, settings.bitDepth) - 1;
+            const stepSize = 255 / steps;
+            
+            // Get all elements that should be affected
+            const elements = document.querySelectorAll('button, input, select, .bg-gray-800, .bg-gray-700, .pixel');
+            
+            elements.forEach(el => {
+                // Get computed background color
+                const bgColor = window.getComputedStyle(el).backgroundColor;
+                
+                if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
+                    const rgb = bgColor.match(/\d+/g);
+                    
+                    if (rgb && rgb.length >= 3) {
+                        const r = Math.round(rgb[0] / stepSize) * stepSize;
+                        const g = Math.round(rgb[1] / stepSize) * stepSize;
+                        const b = Math.round(rgb[2] / stepSize) * stepSize;
+                        
+                        // Preserve alpha if it exists
+                        const a = rgb.length > 3 ? rgb[3] : 1;
+                        
+                        el.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${a})`;
+                    }
+                }
+                
+                // Get computed color (text color)
+                const textColor = window.getComputedStyle(el).color;
+                
+                if (textColor && textColor !== 'rgba(0, 0, 0, 0)') {
+                    const rgb = textColor.match(/\d+/g);
+                    
+                    if (rgb && rgb.length >= 3) {
+                        const r = Math.round(rgb[0] / stepSize) * stepSize;
+                        const g = Math.round(rgb[1] / stepSize) * stepSize;
+                        const b = Math.round(rgb[2] / stepSize) * stepSize;
+                        
+                        el.style.color = `rgb(${r}, ${g}, ${b})`;
+                    }
+                }
+            });
+        }
+        
+        // Update theme colors
+        function updateThemeColors() {
+            const { red, green, blue, alpha } = settings.colors;
+            const opacity = alpha / 255;
+            
+            // Calculate primary theme color
+            const primaryColor = `rgba(${red}, ${green}, ${blue}, ${opacity})`;
+            const primaryDark = `rgba(${red * 0.7}, ${green * 0.7}, ${blue * 0.7}, ${opacity})`;
+            
+            // Update root variables
+            document.documentElement.style.setProperty('--primary-color', primaryColor);
+            document.documentElement.style.setProperty('--primary-dark', primaryDark);
+            
+            // Update UI elements
+            const primaryElements = document.querySelectorAll('.bg-blue-600, .bg-purple-600');
+            primaryElements.forEach(el => {
+                el.style.backgroundColor = primaryColor;
+                if (el.classList.contains('hover:bg-blue-700') || el.classList.contains('hover:bg-purple-700')) {
+                    el.style.setProperty('--tw-bg-opacity', '1');
+                    el.classList.add('hover:brightness-90');
+                }
+            });
+            
+            // Update text colors
+            const textElements = document.querySelectorAll('.text-blue-400, .text-purple-400');
+            textElements.forEach(el => {
+                el.style.color = primaryColor;
+            });
+            
+            // Apply bit depth after color update
+            applyBitDepth();
+        }
+        
+        // Randomize settings
+        function randomizeSettings() {
+            // Random scanlines
+            settings.scanlines = Math.random() > 0.5;
+            scanlineToggle.checked = settings.scanlines;
+            
+            // Random blockiness
+            settings.blockiness = Math.floor(Math.random() * 8) + 1;
+            blockinessSlider.value = settings.blockiness;
+            
+            // Random channels
+            settings.channels = Math.floor(Math.random() * 4) + 1;
+            channelButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.channel-btn[data-channels="${settings.channels}"]`).classList.add('active');
+            
+            // Random bit depth
+            settings.bitDepth = Math.floor(Math.random() * 8) + 1;
+            bitDepthSlider.value = settings.bitDepth;
+            
+            // Random colors
+            settings.colors = {
+                red: Math.floor(Math.random() * 256),
+                green: Math.floor(Math.random() * 256),
+                blue: Math.floor(Math.random() * 256),
+                alpha: Math.floor(Math.random() * 256)
+            };
+            
+            redChannel.value = settings.colors.red;
+            greenChannel.value = settings.colors.green;
+            blueChannel.value = settings.colors.blue;
+            alphaChannel.value = settings.colors.alpha;
+            
+            // Update UI
+            updateUI();
+            
+            // Generate new pixel grid
+            generatePixelGrid();
+        }
+        
+        // Update entire UI
+        function updateUI() {
+            // Apply scanlines
+            if (settings.scanlines) {
+                document.body.classList.add('scanlines');
+            } else {
+                document.body.classList.remove('scanlines');
+            }
+            
+            // Update other controls
+            updateBlockiness();
+            updateBitDepth();
+            updateColorChannels();
+        }
+        
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
