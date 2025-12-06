@@ -10,7 +10,7 @@ RUN apk add --no-cache bash curl git
 COPY frontend/package*.json ./frontend/
 
 # Install frontend dependencies
-RUN cd frontend && npm install
+RUN cd frontend && npm install --legacy-peer-deps
 
 # Copy the rest of the application
 COPY . .

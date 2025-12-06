@@ -1,18 +1,32 @@
-import { useState } from 'react'
+import { Provider } from 'react-redux'
+import { createTheme, ThemeProvider, Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import { styled } from 'styled-components'
-import { Button, Typography, Box, Container, Paper, createTheme, ThemeProvider } from '@mui/material'
+import store from './store'
+import Dashboard from './pages/Dashboard'
+import EquipmentBuilder from './pages/EquipmentBuilder'
+import PresetManager from './pages/PresetManager'
+import SearchPage from './pages/SearchPage'
+import Toast from './components/Toast'
+import { useSelector, useDispatch } from 'react-redux'
+import { setView } from './store/uiSlice'
+import { useLocalStorage, saveEquipmentToStorage, savePresetsToStorage } from './hooks/useLocalStorage'
+import BuildIcon from '@mui/icons-material/Build'
+import SaveIcon from '@mui/icons-material/Save'
+import SearchIcon from '@mui/icons-material/Search'
+import HomeIcon from '@mui/icons-material/Home'
+import { useEffect } from 'react'
 
 // Define our custom theme with SynthMem colors
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#2E5D4B', // Mid-green tone
+      main: '#2E5D4B',
     },
     secondary: {
-      main: '#A0522D', // Burnt umber
+      main: '#A0522D',
     },
     background: {
-      default: '#f8f8f8',
+      default: '#f5f5f5',
       paper: '#ffffff',
     },
   },
@@ -25,69 +39,117 @@ const theme = createTheme({
       color: '#A0522D',
     },
   },
-});
+})
 
-const AppContainer = styled(Container)`
-  text-align: center;
+const MainContent = styled(Box)`
+  flex: 1;
   padding: 2rem;
 `
 
-const StyledPaper = styled(Paper)`
-  padding: 2rem;
-  margin-top: 2rem;
-  border-top: 4px solid #2E5D4B;
+const AppLayout = styled(Box)`
+  display: flex;
+  height: 100vh;
+  background-color: #f5f5f5;
 `
 
-const Logo = styled.div`
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+function AppContent() {
+  const dispatch = useDispatch()
+  const currentView = useSelector((state) => state.ui.currentView)
+  const equipment = useSelector((state) => state.equipment.equipment)
+  const presets = useSelector((state) => state.presets.presets)
 
-  span.synth {
-    color: #2E5D4B;
+  // Load data from localStorage on mount
+  useLocalStorage()
+
+  // Save equipment to localStorage whenever it changes
+  useEffect(() => {
+    saveEquipmentToStorage(equipment)
+  }, [equipment])
+
+  // Save presets to localStorage whenever they change
+  useEffect(() => {
+    savePresetsToStorage(presets)
+  }, [presets])
+
+  const navigationItems = [
+    { label: 'Dashboard', view: 'dashboard', icon: HomeIcon },
+    { label: 'Equipment Builder', view: 'equipment-builder', icon: BuildIcon },
+    { label: 'Preset Manager', view: 'preset-manager', icon: SaveIcon },
+    { label: 'Search', view: 'search', icon: SearchIcon },
+  ]
+
+  const renderView = () => {
+    switch (currentView) {
+      case 'equipment-builder':
+        return <EquipmentBuilder />
+      case 'preset-manager':
+        return <PresetManager />
+      case 'search':
+        return <SearchPage />
+      default:
+        return <Dashboard />
+    }
   }
-
-  span.mem {
-    color: #A0522D;
-  }
-`
-
-function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <ThemeProvider theme={theme}>
-      <AppContainer maxWidth="sm">
-        <StyledPaper elevation={3}>
-          <Logo>
-            <span className="synth">Synth</span>
-            <span className="mem">Mem</span>
-          </Logo>
-
-          <Typography variant="h5" component="h2" gutterBottom>
-            Synthesizer Memory Manager
+    <AppLayout>
+      <AppBar position="fixed" sx={{ zIndex: 1300 }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+            <span style={{ color: '#2E5D4B' }}>Synth</span>
+            <span style={{ color: '#A0522D' }}>Mem</span>
           </Typography>
+        </Toolbar>
+      </AppBar>
 
-          <Box sx={{ my: 4 }}>
-            <Typography variant="body1" paragraph>
-              This is a Progressive Web App (PWA) for managing synthesizer presets and settings.
-            </Typography>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: 240,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: 240,
+            boxSizing: 'border-box',
+            marginTop: '64px',
+          },
+        }}
+      >
+        <List>
+          {navigationItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <ListItem key={item.view} disablePadding>
+                <ListItemButton
+                  selected={currentView === item.view}
+                  onClick={() => dispatch(setView(item.view))}
+                >
+                  <ListItemIcon>
+                    <Icon />
+                  </ListItemIcon>
+                  <ListItemText primary={item.label} />
+                </ListItemButton>
+              </ListItem>
+            )
+          })}
+        </List>
+      </Drawer>
 
-            <Typography variant="body2" paragraph>
-              You clicked the button {count} times
-            </Typography>
+      <MainContent sx={{ marginTop: '64px', marginLeft: '240px' }}>
+        {renderView()}
+      </MainContent>
 
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setCount((count) => count + 1)}
-            >
-              Click me
-            </Button>
-          </Box>
-        </StyledPaper>
-      </AppContainer>
-    </ThemeProvider>
+      <Toast />
+    </AppLayout>
+  )
+}
+
+function App() {
+  return (
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <AppContent />
+      </ThemeProvider>
+    </Provider>
   )
 }
 

@@ -54,11 +54,11 @@
     "description": "Frontend unit tests",
     "tests": [
       {
-        "name": "src/App.test.jsx  (3 tests) 63ms",
-        "status": "passed",
-        "error": null
+        "name": "Frontend execution",
+        "status": "failed",
+        "error": "Command failed: cd frontend && npm test\n⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  src/App.test.jsx [ src/App.test.jsx ]\nError: Directory import '/app/frontend/node_modules/@mui/material/utils' is not supported resolving ES modules imported from /app/frontend/node_modules/@mui/icons-material/esm/utils/createSvgIcon.js\nDid you mean to import @mui/material/node/utils/index.js?\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\nSerialized Error: { url: 'file:///app/frontend/node_modules/@mui/material/utils', code: 'ERR_UNSUPPORTED_DIR_IMPORT' }\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n"
       }
     ],
-    "status": "passed"
+    "status": "failed"
   }
 }
