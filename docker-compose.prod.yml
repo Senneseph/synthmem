@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Production frontend service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: synthmem-frontend
+    ports:
+      - "127.0.0.1:4208:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - synthmem-network
+    labels:
+      - "com.synthmem.description=SynthMem Frontend"
+      - "com.synthmem.version=0.1.0"
+
+networks:
+  synthmem-network:
+    driver: bridge
+
